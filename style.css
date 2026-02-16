@@ -1,0 +1,481 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&display=swap');
+:root{
+  --bg:#050814;
+  --panel: rgba(18,26,51,.72);
+  --border: rgba(255,255,255,.12);
+  --text:#e9eeff;
+  --muted:#a9b3d6;
+  :root{
+  --vv-bottom: 0px;
+  --vv-top: 0px;
+
+  /* بزرگ‌تر */
+  --mb-w: clamp(66px, 6.2vw, 86px);
+  --mb-h: clamp(58px, 5.4vw, 74px);
+  --mb-font: clamp(18px, 2.1vw, 24px);
+
+  /* فاصله‌ها */
+  --mb-gap: clamp(10px, 1.4vw, 14px);
+  --mb-radius: 20px;
+
+  /* فاصله‌ی امن بین جهت‌ها و Start/R */
+  --mb-safe-row-gap: clamp(14px, 2vw, 20px);
+}
+
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:
+    radial-gradient(900px 520px at 15% 15%, rgba(77,255,210,.12), transparent 60%),
+    radial-gradient(850px 520px at 85% 20%, rgba(255,170,80,.10), transparent 55%),
+    radial-gradient(900px 520px at 65% 85%, rgba(120,120,255,.10), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  display:flex;
+  justify-content:center;
+  padding:16px;
+}
+.wrap{width:min(1220px, 100%); position:relative;}
+header{
+  display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.titleBox,.hudBox,.prompt{
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+  backdrop-filter: blur(10px);
+}
+.titleBox h1{margin:0;font-size:15px}
+.titleBox p{margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.6}
+
+.hud{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  font-size:12px; color:var(--muted);
+}
+.chip{
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  padding:7px 10px;
+  border-radius:999px;
+  display:flex; gap:8px; align-items:center;
+}
+.chip b{color:#ffd166}
+
+.prompt{
+  display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.prompt .q{display:flex; gap:10px; flex-wrap:wrap; align-items:baseline;}
+.prompt .q .label{color:var(--muted); font-size:12px;}
+.prompt .q .value{font-weight:900; font-size:16px;}
+
+.row{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+.kbds{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+.kbd{
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:12px;
+  color: var(--muted);
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+  white-space:nowrap;
+}
+
+canvas{
+  width:100%;
+  height:auto;
+  border-radius:22px;
+  border:1px solid var(--border);
+  background: rgba(0,0,0,.10);
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  display:block;
+}
+
+.controls{
+  margin-top:10px;
+  display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between;
+  color: var(--muted);
+  font-size:12px;
+}
+.btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{
+  font: inherit;
+  color: var(--text);
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  padding:9px 12px;
+  border-radius:14px;
+  cursor:pointer;
+}
+button.primary{
+  background: rgba(69,240,166,.16);
+  border-color: rgba(69,240,166,.35);
+}
+
+/* Choice Overlay */
+.choiceOverlay{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,.55);
+  border-radius:22px;
+}
+.choiceOverlay.show{ display:flex; }
+.choiceCard{
+  width:min(560px, 92%);
+  background: rgba(18,26,51,.92);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+  backdrop-filter: blur(10px);
+}
+.choiceTitle{
+  font-weight:900;
+  font-size:18px;
+  margin-bottom:8px;
+}
+.choiceSub{
+  color: var(--muted);
+  font-size:12px;
+  margin-bottom:12px;
+}
+.choiceBtns{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.choiceHint{
+  color: rgba(255,255,255,.55);
+  font-size:12px;
+}
+/* ===== LOCK LAYOUT: left pad stays LEFT, right stack stays RIGHT ===== */
+#mctrl{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;          /* مهم: خود کانتینر کلیکی نباشه */
+}
+
+/* فقط خود دکمه‌ها کلیک بخورن */
+#mctrl .mbtn,
+#mctrl .mctrl-leftpad,
+#mctrl .mctrl-leftpad .mbtn-start,
+#mctrl .mctrl-leftpad .mbtn-reset{
+  margin-top: var(--mb-safe-row-gap);
+}
+
+#mctrl .mctrl-rightstack{
+  pointer-events: auto;
+}
+
+/* LEFT PAD (سمت چپ بمونه) */
+#mctrl .mctrl-leftpad{
+  position: absolute !important;
+  left: 12px !important;
+  right: auto !important;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom)) !important;
+
+  display: grid !important;
+  grid-template-columns: var(--mb-w) var(--mb-w);
+    grid-template-rows: var(--mb-h) var(--mb-h) var(--mb-safe-row-gap) var(--mb-h);
+
+  gap: var(--mb-gap);
+  align-content: end;
+}
+
+/* ▲ بالا تمام عرض */
+#mctrl .mctrl-leftpad .mbtn-up{ grid-column: 1 / span 2; }
+/* ردیف‌ها رو دقیق قفل کن */
+#mctrl .mctrl-leftpad .mbtn-up{ grid-row: 1; }
+#mctrl .mctrl-leftpad .mbtn-left{ grid-row: 2; }
+#mctrl .mctrl-leftpad .mbtn-right{ grid-row: 2; }
+
+/* Start/R برن ردیف 4 (بعد از spacer row) */
+#mctrl .mctrl-leftpad .mbtn-start,
+#mctrl .mctrl-leftpad .mbtn-reset{ grid-row: 4; }
+
+/* start / R ردیف سوم */
+#mctrl .mctrl-leftpad .mbtn-start{ grid-column: 1; }
+#mctrl .mctrl-leftpad .mbtn-reset{ grid-column: 2; }
+
+/* RIGHT STACK (سمت راست بمونه) */
+#mctrl .mctrl-rightstack{
+  position: absolute !important;
+  right: 12px !important;
+  left: auto !important;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom)) !important;
+
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--mb-gap);
+  align-items: flex-end;
+}
+
+/* ===== UNIFY STYLE: left buttons look like right buttons ===== */
+#mctrl .mbtn{
+  width: var(--mb-w);
+  height: var(--mb-h);
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.20);
+  background: rgba(0,0,0,.33);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.55);
+
+  color: rgba(255,255,255,.96);
+  font: 900 var(--mb-font) system-ui;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+#mctrl .mbtn:active{
+  transform: scale(.97);
+  background: rgba(255,255,255,.14);
+}
+
+/* Start/R فقط فونت کوچیک‌تر؛ شکل/اندازه یکی بمونه */
+#mctrl .mctrl-leftpad .mbtn-start,
+#mctrl .mctrl-leftpad .mbtn-reset{
+  font-size: clamp(12px, 1.7vw, 14px);
+  font-weight: 800;
+}
+/* ===== RIGHT BUTTONS NORMAL SIZE ===== */
+#mctrl .mctrl-rightstack{
+  gap: 12px !important;   /* فاصله مناسب بین دکمه‌ها */
+  padding: 6px !important;
+}
+
+#mctrl .mctrl-rightstack .mbtn{
+  width: 68px !important;
+  height: 60px !important;
+  font-size: 19px !important;
+  border-radius: 18px;
+}
+
+/* دکمه JET کمی متن کوچیک‌تر */
+#mctrl .mctrl-rightstack .mbtn:nth-child(2){
+  font-size: 15px !important;
+  letter-spacing: .5px;
+}
+/* ===== LEFT PAD same size as RIGHT + safe spacing ===== */
+
+/* فاصله‌ی کلی داخل پنل چپ */
+#mctrl .mctrl-leftpad{
+  gap: 12px !important;          /* فاصله بین دکمه‌های جهت */
+  padding: 6px !important;
+}
+
+/* همه دکمه‌های سمت چپ هم‌اندازه‌ی سمت راست */
+#mctrl .mctrl-leftpad .mbtn{
+  width: 68px !important;
+  height: 60px !important;
+  font-size: 19px !important;
+  border-radius: 18px;
+}
+
+/* دکمه بالایی (▲) تمام عرضِ دو ستون */
+#mctrl .mctrl-leftpad .mbtn-up{
+  grid-column: 1 / span 2;
+}
+
+/* فاصله‌ی امن بین جهت‌ها و Start/R */
+#mctrl .mctrl-leftpad .mbtn-start,
+#mctrl .mctrl-leftpad .mbtn-reset{
+  margin-top: 14px !important;   /* فاصله از جهت‌ها */
+  font-size: 15px !important;    /* متن کوچک‌تر */
+}
+/* ▲ دقیقاً وسطِ چپ و راست + کمی شیفت به چپ */
+#mctrl .mctrl-leftpad .mbtn-up{
+  grid-column: 1 / span 2;      /* کل عرض دو ستون */
+  justify-self: center;         /* وسطِ چپ/راست */
+  transform: translateX(-4px);  /* کمی به چپ؛ اگر زیاد بود -2px یا -6px کن */
+}
+/* ===== GERMAN / EURO GAME FONT ===== */
+
+#mctrl .mbtn{
+  font-family: "Orbitron", system-ui, sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* متن JET کمی جمع‌تر */
+#mctrl .mctrl-rightstack .mbtn:nth-child(2){
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  font-size: 14px;
+}
+
+/* Start و R هم تمیز */
+#mctrl .mctrl-leftpad .mbtn-start,
+#mctrl .mctrl-leftpad .mbtn-reset{
+  font-family: "Orbitron", system-ui, sans-serif !important;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 13px;
+}
+/* ===== FIX LEFT BUTTONS CLICK + SIZE ===== */
+
+/* overlay باید کلیک‌پذیر باشه */
+#mctrl{
+}
+
+/* خود پدها */
+#mctrl .mctrl-leftpad,
+#mctrl .mctrl-rightstack{
+
+}
+
+/* اندازه همه دکمه‌ها ۵٪ کوچیک‌تر */
+#mctrl .mbtn{
+  width: calc(var(--mb-w) * 0.95);
+  height: calc(var(--mb-h) * 0.95);
+  font-size: calc(var(--mb-font) * 0.95);
+}
+
+/* فاصله امن بین جهت‌ها و Start/R */
+#mctrl .mctrl-leftpad{
+  gap: calc(var(--mb-gap) * 1.2);
+  padding-bottom: 6px;
+}
+
+/* فاصله عمودی بیشتر برای ردیف پایین */
+#mctrl .mctrl-leftpad .mbtn-start,
+#mctrl .mctrl-leftpad .mbtn-reset{
+  margin-top: 6px;
+}
+/* === shrink buttons only (keep spacing) === */
+#mctrl .mbtn{
+  transform: scale(0.88);   /* مقدار اصلی */
+}
+
+/* active هم درست بمونه */
+#mctrl .mbtn:active{
+  transform: scale(0.83);
+}
+/* === Bigger text for Start / Reset / Music === */
+#mctrl .mbtn-start,
+#mctrl .mbtn-reset{
+  font-size: calc(var(--mb-font) * 1.15) !important;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+/* دکمه موزیک پایین صفحه */
+#musicBtn{
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+#btnStart,
+#btnReset{
+  display: none !important;
+}
+/* === Bottom buttons equal size === */
+.controls .btns{
+  display:flex;
+  gap:12px;
+}
+
+.controls .btns button{
+  width:120px;          /* هر سه هم اندازه */
+  height:42px;
+  font-size:14px;
+  font-weight:800;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* اگر سبز (primary) بود هم اندازه بمونه */
+.controls .btns button.primary{
+  width:120px;
+}
+.controls .btns button{
+  font-family: "Orbitron", system-ui, sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+#msg{
+  display:none !important;
+}
+/* === Center bottom buttons === */
+.controls{
+  justify-content:center !important;
+}
+
+.controls .btns{
+  justify-content:center !important;
+  width:100%;
+}
+
+.controls .btns button{
+  min-width:110px;
+  text-align:center;
+}
+/* === Ensure all buttons clickable on mobile === */
+button{
+
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#mctrl{
+
+}
+
+#mctrl .mbtn{
+
+}
+/* ===== Phone only: push controls a bit lower (tablet unchanged) ===== */
+:root{ --mctrl-drop: 0px; }
+
+@media (max-width: 600px){
+  :root{ --mctrl-drop: 18px; }
+}
+
+/* apply drop to both sides */
+#mctrl .mctrl-leftpad,
+#mctrl .mctrl-rightstack{
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px) + var(--vv-bottom) + var(--mctrl-drop)) !important;
+}
+/* ✅ mctrl کل صفحه رو لمس‌ناپذیر کن، فقط خود دکمه‌ها لمس‌پذیر باشن */
+#mctrl{
+  pointer-events: none !important;
+}
+
+/* فقط پنل‌ها/دکمه‌های موبایل کلیک بخورن */
+#mctrl .mctrl-leftpad,
+#mctrl .mctrl-rightstack,
+#mctrl .mbtn{
+  pointer-events: auto !important;
+}
+#mctrl .mbtn{
+  pointer-events: auto !important;
+  touch-action: none !important;
+}
+.controls{
+  position: relative;
+  z-index: 10050;
+}
